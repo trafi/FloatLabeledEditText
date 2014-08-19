@@ -22,6 +22,9 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,13 +42,14 @@ public class FloatLabeledEditText extends LinearLayout {
     private ColorStateList textColor;
 
     private TextView hintTextView;
-    private EditText editText;
+    private AutoCompleteTextView editText;
 
     private Context mContext;
     private String textFontTag;
     private float textUpperHintSize;
     private float textHintSize;
     private float editTextSize;
+    private TextWatcher textWatcher;
 
     public FloatLabeledEditText(Context context) {
         super(context);
@@ -97,7 +101,7 @@ public class FloatLabeledEditText extends LinearLayout {
         View view = LayoutInflater.from(mContext).inflate(R.layout.widget_float_labeled_edit_text, this);
 
         hintTextView = (TextView) view.findViewById(R.id.FloatLabeledEditTextHint);
-        editText = (EditText) view.findViewById(R.id.FloatLabeledEditTextEditText);
+        editText = (AutoCompleteTextView) view.findViewById(R.id.FloatLabeledEditTextEditText);
         editText.setBackgroundDrawable(null);
 
         if (hint != null) {
@@ -132,15 +136,24 @@ public class FloatLabeledEditText extends LinearLayout {
     private TextWatcher onTextChanged = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            if (textWatcher != null) {
+                textWatcher.beforeTextChanged(charSequence, i, i2, i3);
+            }
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            if (textWatcher != null) {
+                textWatcher.onTextChanged(charSequence, i, i2, i3);
+            }
         }
 
         @Override
         public void afterTextChanged(Editable editable) {
             setShowHint(editable.length() != 0);
+            if (textWatcher != null) {
+                textWatcher.afterTextChanged(editable);
+            }
         }
     };
 
@@ -154,6 +167,20 @@ public class FloatLabeledEditText extends LinearLayout {
             }
         }
     };
+
+    public void setAutocompleteAdapter(ArrayAdapter<String> adapter) {
+        editText.setAdapter(adapter);
+        editText.setThreshold(0);
+        editText.showDropDown();
+    }
+
+    public boolean isAutocompleteHasFocus() {
+        return editText.isFocused();
+    }
+
+    public void setAutocompleteClickListener(AdapterView.OnItemClickListener listener) {
+        editText.setOnItemClickListener(listener);
+    }
 
     private void setShowHint(final boolean show) {
         AnimatorSet animation = null;
@@ -187,8 +214,12 @@ public class FloatLabeledEditText extends LinearLayout {
         }
     }
 
-    public EditText getEditText() {
+    public AutoCompleteTextView getAutocompleteTextView() {
         return editText;
+    }
+
+    public void addTextChangeListener(TextWatcher textWatcher) {
+        this.textWatcher = textWatcher;
     }
 
     public void setHint(String hint) {
