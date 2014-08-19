@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wrapp.floatlabelededittext">
 
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="20" />
 
 </manifest>

@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -17,6 +16,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -25,7 +25,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 
 
 public class FloatLabeledEditText extends LinearLayout {
@@ -43,6 +42,10 @@ public class FloatLabeledEditText extends LinearLayout {
     private EditText editText;
 
     private Context mContext;
+    private String textFontTag;
+    private float textUpperHintSize;
+    private float textHintSize;
+    private float editTextSize;
 
     public FloatLabeledEditText(Context context) {
         super(context);
@@ -57,7 +60,6 @@ public class FloatLabeledEditText extends LinearLayout {
         initialize();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public FloatLabeledEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mContext = context;
@@ -77,6 +79,10 @@ public class FloatLabeledEditText extends LinearLayout {
             singleLine = a.getBoolean(R.styleable.FloatLabeledEditText_fletSingleLine, false);
             hintColor = a.getColorStateList(R.styleable.FloatLabeledEditText_fletHintTextColor);
             textColor = a.getColorStateList(R.styleable.FloatLabeledEditText_fletTextColor);
+            textFontTag = a.getString(R.styleable.FloatLabeledEditText_fletFontTag);
+            textUpperHintSize = a.getDimension(R.styleable.FloatLabeledEditText_fletHintUpperTextSize, 16);
+            textHintSize = a.getDimension(R.styleable.FloatLabeledEditText_fletHintTextSize, 16);
+            editTextSize = a.getDimension(R.styleable.FloatLabeledEditText_fletEditTextSize, 16);
         } finally {
             a.recycle();
         }
@@ -92,6 +98,7 @@ public class FloatLabeledEditText extends LinearLayout {
 
         hintTextView = (TextView) view.findViewById(R.id.FloatLabeledEditTextHint);
         editText = (EditText) view.findViewById(R.id.FloatLabeledEditTextEditText);
+        editText.setBackgroundDrawable(null);
 
         if (hint != null) {
             setHint(hint);
@@ -114,6 +121,12 @@ public class FloatLabeledEditText extends LinearLayout {
         hintTextView.setVisibility(View.INVISIBLE);
         editText.addTextChangedListener(onTextChanged);
         editText.setOnFocusChangeListener(onFocusChanged);
+
+        hintTextView.setTag(textFontTag);
+        editText.setTag(textFontTag);
+
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textHintSize);
+        hintTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textUpperHintSize);
     }
 
     private TextWatcher onTextChanged = new TextWatcher() {
@@ -135,9 +148,9 @@ public class FloatLabeledEditText extends LinearLayout {
         @Override
         public void onFocusChange(View view, boolean gotFocus) {
             if (gotFocus && hintTextView.getVisibility() == VISIBLE) {
-                ObjectAnimator.ofFloat(hintTextView, "alpha", 0.33f, 1f).start();
-            } else if (hintTextView.getVisibility() == VISIBLE){
-                ObjectAnimator.ofFloat(hintTextView, "alpha", 1f, 0.33f).start();
+                ObjectAnimator.ofFloat(hintTextView, "alpha", 0.80f, 1f).start();
+            } else if (hintTextView.getVisibility() == VISIBLE) {
+                ObjectAnimator.ofFloat(hintTextView, "alpha", 1f, 0.80f).start();
             }
         }
     };
@@ -311,7 +324,7 @@ public class FloatLabeledEditText extends LinearLayout {
         hintTextView.setTextColor(color);
     }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+
     @Override
     public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
         if (isIcsOrAbove()) {
@@ -320,7 +333,6 @@ public class FloatLabeledEditText extends LinearLayout {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
         if (isIcsOrAbove()) {
