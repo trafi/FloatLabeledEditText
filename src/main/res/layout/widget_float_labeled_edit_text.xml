@@ -12,7 +12,7 @@
         android:paddingRight="@dimen/flet_hint_text_padding_horizontal"
         android:textSize="@dimen/flet_hint_text_size" />
 
-    <AutoCompleteTextView
+    <com.wrapp.floatlabelededittext.CustomAutoCompleteTextView
         android:id="@+id/FloatLabeledEditTextEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

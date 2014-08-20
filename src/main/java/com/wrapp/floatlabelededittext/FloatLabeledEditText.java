@@ -25,7 +25,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -50,6 +49,7 @@ public class FloatLabeledEditText extends LinearLayout {
     private float textHintSize;
     private float editTextSize;
     private TextWatcher textWatcher;
+    private OnFocusChangeListener mOnFocusChangeListener;
 
     public FloatLabeledEditText(Context context) {
         super(context);
@@ -101,8 +101,9 @@ public class FloatLabeledEditText extends LinearLayout {
         View view = LayoutInflater.from(mContext).inflate(R.layout.widget_float_labeled_edit_text, this);
 
         hintTextView = (TextView) view.findViewById(R.id.FloatLabeledEditTextHint);
-        editText = (AutoCompleteTextView) view.findViewById(R.id.FloatLabeledEditTextEditText);
+        editText = (CustomAutoCompleteTextView) view.findViewById(R.id.FloatLabeledEditTextEditText);
         editText.setBackgroundDrawable(null);
+
 
         if (hint != null) {
             setHint(hint);
@@ -165,8 +166,16 @@ public class FloatLabeledEditText extends LinearLayout {
             } else if (hintTextView.getVisibility() == VISIBLE) {
                 ObjectAnimator.ofFloat(hintTextView, "alpha", 1f, 0.80f).start();
             }
+
+            if (mOnFocusChangeListener != null) {
+                mOnFocusChangeListener.onFocusChange(view, gotFocus);
+            }
         }
     };
+
+    public void setOnFocusChangeListener(OnFocusChangeListener listener) {
+        mOnFocusChangeListener = listener;
+    }
 
     public void setAutocompleteAdapter(ArrayAdapter<String> adapter) {
         editText.setAdapter(adapter);
